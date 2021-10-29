@@ -1,5 +1,5 @@
 import * as ActionTypes from './ActionTypes';
-import { baseUrl } from '../shared/baseUrl';
+import {baseUrl} from '../shared/baseUrl';
 
 
 //--------------------------------------------------------------------------------------------------------
@@ -13,7 +13,7 @@ export const addComment = (comment) => ({
 export const postComment = (dishId, rating, author, comment) => (dispatch) => {
     const newComment = {
         dishId: dishId,
-        reating: rating,
+        rating: rating,
         author: author,
         comment: comment
     }
@@ -27,21 +27,23 @@ export const postComment = (dishId, rating, author, comment) => (dispatch) => {
         },
         credentials: "same-origin"
     })
-    .then( response => {
-        if (response.ok) {
-            return response;
-        } else {
-            var error = new Error('Error' + response.status + ': ' + response.statusText);
-            error.response = response;
-            throw error;
-        }
-    }, error => {
-        var errmess = new Error(error.message);
-        throw errmess;
-    })
-    .then(response => response.json())
-    .then(response => dispatch(addComment(response)))
-    .catch(error => {console.log('post comments', error.message); alert('Your comment could not be posted\nError: '+error.message); });
+        .then(response => {
+            if (response.ok) {
+                return response;
+            } else {
+                const error = new Error('Error' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        }, error => {
+            throw new Error(error.message);
+        })
+        .then(response => response.json())
+        .then(response => dispatch(addComment(response)))
+        .catch(error => {
+            console.log('post comments', error.message);
+            alert('Your comment could not be posted\nError: ' + error.message);
+        });
 }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -51,17 +53,16 @@ export const fetchDishes = () => (dispatch) => {
     dispatch(dishesLoading(true));
 
     return fetch(baseUrl + 'dishes')
-        .then( response => {
+        .then(response => {
             if (response.ok) {
                 return response;
             } else {
-                var error = new Error('Error' + response.status + ': ' + response.statusText);
+                const error = new Error('Error' + response.status + ': ' + response.statusText);
                 error.response = response;
                 throw error;
             }
         }, error => {
-            var errmess = new Error(error.message);
-            throw errmess;
+            throw new Error(error.message);
         })
         .then(response => response.json())
         .then(dishes => dispatch(addDishes(dishes)))
@@ -84,19 +85,18 @@ export const addDishes = (dishes) => ({
 
 //------------------------------------------------------------------------------------------------------------
 
-export const fetchComments = () => (dispatch) => {    
+export const fetchComments = () => (dispatch) => {
     return fetch(baseUrl + 'comments')
         .then(response => {
-            if(response.ok) {
+            if (response.ok) {
                 return response;
             } else {
-                var error = new Error('Error ' + response.status + ': ' + response.statusText);
+                const error = new Error('Error ' + response.status + ': ' + response.statusText);
                 error.response = response;
                 throw error;
             }
         }, error => {
-            var errmess = new Error(error.message);
-            throw errmess;
+            throw new Error(error.message);
         })
         .then(response => response.json())
         .then(comments => dispatch(addComments(comments)))
@@ -116,25 +116,24 @@ export const addComments = (comments) => ({
 //---------------------------------------------------------------------------------------------------------
 
 export const fetchPromos = () => (dispatch) => {
-    
+
     dispatch(promosLoading());
 
     return fetch(baseUrl + 'promotions')
-    .then(response => {
-        if(response.ok) {
-            return response;
-        } else {
-            var error = new Error('Error ' + response.status + ': ' + response.statusText);
-            error.response = response;
-            throw error;
-        }
-    }, error => {
-        var errmess = new Error(error.message);
-        throw errmess;
-    })
-    .then(response => response.json())
-    .then(promos => dispatch(addPromos(promos)))
-    .catch(error => dispatch(promosFailed(error.message)));
+        .then(response => {
+            if (response.ok) {
+                return response;
+            } else {
+                const error = new Error('Error ' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        }, error => {
+            throw new Error(error.message);
+        })
+        .then(response => response.json())
+        .then(promos => dispatch(addPromos(promos)))
+        .catch(error => dispatch(promosFailed(error.message)));
 }
 
 export const promosLoading = () => ({
@@ -158,21 +157,20 @@ export const fetchLeaders = () => (dispatch) => {
     dispatch(leadersLoading());
 
     return fetch(baseUrl + 'leaders')
-    .then(response => {
-        if(response.ok) {
-            return response;
-        } else {
-            var error = new Error('Error ' + response.status + ': ' + response.statusText);
-            error.response = response;
-            throw error;
-        }
-    }, error => {
-        var errmess = new Error(error.message);
-        throw errmess;
-    })
-    .then(response => response.json())
-    .then(leaders => dispatch(addLeaders(leaders)))
-    .catch(error => dispatch(leadersFailed(error.message)));
+        .then(response => {
+            if (response.ok) {
+                return response;
+            } else {
+                const error = new Error('Error ' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        }, error => {
+            throw new Error(error.message);
+        })
+        .then(response => response.json())
+        .then(leaders => dispatch(addLeaders(leaders)))
+        .catch(error => dispatch(leadersFailed(error.message)));
 }
 
 export const leadersLoading = () => ({
@@ -197,7 +195,7 @@ export const addFeedback = (feedback) => ({
 });
 
 export const postFeedback = (feedback) => (dispatch) => {
-    
+
     return fetch(baseUrl + 'feedback', {
         method: 'POST',
         body: JSON.stringify(feedback),
@@ -206,19 +204,21 @@ export const postFeedback = (feedback) => (dispatch) => {
         },
         credentials: "same-origin"
     })
-    .then( response => {
-        if (response.ok) {
-            return response;
-        } else {
-            var error = new Error('Error' + response.status + ': ' + response.statusText);
-            error.response = response;
-            throw error;
-        }
-    }, error => {
-        var errmess = new Error(error.message);
-        throw errmess;
-    })
-    .then(response => response.json())
-    .then(response => dispatch(addFeedback(response)))
-    .catch(error => {console.log('post feedback', error.message); alert('Your feedback could not be posted\nError: '+error.message); });
+        .then(response => {
+            if (response.ok) {
+                return response;
+            } else {
+                const error = new Error('Error' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        }, error => {
+            throw new Error(error.message);
+        })
+        .then(response => response.json())
+        .then(response => dispatch(addFeedback(response)))
+        .catch(error => {
+            console.log('post feedback', error.message);
+            alert('Your feedback could not be posted\nError: ' + error.message);
+        });
 }

@@ -7,6 +7,7 @@ import {Comments} from './reducers/comments';
 import {Promotions} from './reducers/promotions';
 import {Leaders} from './reducers/leaders';
 import {Authentication} from './reducers/authentication'
+import {Favorites} from "./reducers/favorites";
 
 import {InitialFeedback} from './form';
 import thunk from 'redux-thunk';
@@ -23,7 +24,8 @@ export const ConfigureStore = () => {
             ...createForms({
                 feedback: InitialFeedback
             }),
-            authentication: Authentication
+            authentication: Authentication,
+            favorites: Favorites
         }),
         applyMiddleware(thunk, logger)
     );

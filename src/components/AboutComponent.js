@@ -15,8 +15,8 @@ const RenderLeader = ({leaders, isLoading, errMess}) => {
             <Stagger in>
                 {leaders.leaders.map((leader) => {
                     return (
-                        <Fade in>
-                            <div key={leader.id} className="col-12 mt-5">
+                        <Fade in  key={leader._id}>
+                            <div className="col-12 mt-5">
                                 <Media tag="li">
                                     <Media left middle>
                                         <Media object src={baseUrl + leader.image} alt={leader.name}/>

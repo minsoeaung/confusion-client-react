@@ -258,7 +258,7 @@ export const logoutUser = () => (dispatch) => {
     dispatch(requestLogout())
     localStorage.removeItem('token');
     localStorage.removeItem('creds');
-    // dispatch(favoritesFailed("Error 401: Unauthorized"));
+    dispatch(favoritesFailed("Error 401: Unauthorized"));
     dispatch(receiveLogout())
 }
 
@@ -298,4 +298,105 @@ export const loginUser = (creds) => (dispatch) => {
             }
         })
         .catch(error => dispatch(loginError(error.message)))
+}
+
+// ------------------------------------------- favorite ----------------------------------------------------------------
+
+export const favoritesLoading = () => {
+    return {
+        type: ActionTypes.FAVORITES_LOADING
+    }
+}
+
+export const favoritesFailed = (errMess) => {
+    return {
+        type: ActionTypes.FAVORITES_FAILED,
+        payload: errMess
+    }
+}
+
+export const addFavorites = (favorites) => {
+    return {
+        type: ActionTypes.ADD_FAVORITES,
+        payload: favorites
+    }
+}
+
+export const fetchFavorites = () => (dispatch) => {
+    dispatch(favoritesLoading(true))
+    const bearer = 'Bearer' + localStorage.getItem('token')
+
+    return fetch(baseUrl + 'favorites', {
+        headers: {
+            'Authorization': bearer
+        }
+    })
+        .then(response => {
+            if (response.ok) {
+                return response
+            } else {
+                const error = new Error('Error ' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        }, error => {
+            throw new Error(error.message)
+        })
+        .then(response => response.json())
+        .then(favorites => dispatch(addFavorites(favorites)))
+        .catch(error => dispatch(favoritesFailed(error.message)))
+}
+
+export const postFavorite = (dishId) => (dispatch) => {
+    const bearer = 'Bearer' + localStorage.getItem('token')
+
+    return fetch(baseUrl + 'favorites/' + dishId, {
+        method: 'POST',
+        body: JSON.stringify({"_id": dishId}),
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': bearer
+        },
+        credentials: 'same-origin'
+    })
+        .then(response => {
+            if (response.ok) {
+                return response
+            } else {
+                const error = new Error('Error ' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        }, error => {
+            throw new Error(error.message)
+        })
+        .then(response => response.json())
+        .then(favorites => { dispatch(addFavorites(favorites)) })
+        .catch(error => dispatch(favoritesFailed(error.message)))
+}
+
+export const deleteFavorite = (dishId) => (dispatch) => {
+    const bearer = 'Bearer' + localStorage.getItem('token')
+
+    return fetch(baseUrl + 'favorites/' + dishId, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': bearer
+        },
+        credentials: 'same-origin'
+    })
+        .then(response => {
+            if (response.ok) {
+                return response;
+            } else {
+                const error = new Error('Error ' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        }, error => {
+            throw new Error(error.message)
+        })
+        .then(response => response.json())
+        .then(favorites => { dispatch(addFavorites(favorites)) })
+        .catch(error => dispatch(favoritesFailed(error.message)));
 }

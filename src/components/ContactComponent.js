@@ -17,6 +17,10 @@ class Contact extends Component {
     }
 
     handleSubmit(values) {
+
+        // server does not support feedback route yet
+        // TODO make server supports feedback route
+
         console.log('Current State is: ' + JSON.stringify(values));
         alert('Current State is: ' + JSON.stringify(values));
         this.props.resetFeedbackForm();

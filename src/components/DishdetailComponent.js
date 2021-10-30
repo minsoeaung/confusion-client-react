@@ -1,29 +1,49 @@
 import React, { Component } from 'react';
-import { Card, CardImg, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbItem, Button, Modal, ModalHeader, ModalBody, Label, Row, Col} from 'reactstrap';
+import {
+    Card,
+    CardImg,
+    CardText,
+    CardBody,
+    CardTitle,
+    Breadcrumb,
+    BreadcrumbItem,
+    Button,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    Label,
+    Row,
+    Col,
+    CardImgOverlay
+} from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Control, LocalForm, Errors } from 'react-redux-form';
 import { Loading } from './LoadingComponent';
 import { baseUrl } from '../shared/baseUrl';
 import { FadeTransform, Fade, Stagger } from 'react-animation-components';
 
-function RenderDish({dish}) {
-    if(dish != null) {
-        return (
-            <div className="col-12 col-md-5 m-1">
-                <FadeTransform in transformProps={{exitTransform: 'scale(0.5) translateY(-50%)'}}>
-                    <Card>
-                        <CardImg width="100%" src={baseUrl + dish.image} alt={dish.name} />
-                        <CardBody>
-                            <CardTitle>{dish.name}</CardTitle>
-                            <CardText>{dish.description}</CardText>
-                        </CardBody>
-                    </Card>
-                </FadeTransform>
-            </div>
-        );
-    } else {
-        return (<div/>);
-    }
+function RenderDish({dish, favorite, postFavorite}) {
+    return (
+        <div className="col-12 col-md-5 m-1">
+            <FadeTransform in transformProps={{exitTransform: 'scale(0.5) translateY(-50%)'}}>
+                <Card>
+                    <CardImg width="100%" src={baseUrl + dish.image} alt={dish.name} />
+                    <CardImgOverlay>
+                        <Button outline color="primary" onClick={() => favorite && postFavorite(dish._id)}>
+                            {favorite
+                                ? <span className="fa fa-heart"/>
+                                : <span className="fa fa-heart-o"/>
+                            }
+                        </Button>
+                    </CardImgOverlay>
+                    <CardBody>
+                        <CardTitle>{dish.name}</CardTitle>
+                        <CardText>{dish.description}</CardText>
+                    </CardBody>
+                </Card>
+            </FadeTransform>
+        </div>
+    );
 }
 
 function RenderComments({comments, postComment, dishId}) {
@@ -35,8 +55,8 @@ function RenderComments({comments, postComment, dishId}) {
                 <Stagger in>
                     {comments.map((comment) => {
                         return (
-                            <Fade in>
-                                <li key={comment.id}>
+                            <Fade key={comment._id}>
+                                <li>
                                     <p>{comment.comment}</p>
                                     <p>-- {comment.author} , {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comment.date)))}</p>
                                 </li>
@@ -86,10 +106,10 @@ function DishDetail(props) {
                     </div>
                 </div>
                 <div className="row">
-                    <RenderDish dish={props.dish}/>
+                    <RenderDish dish={props.dish} favorite={props.favorite} postFavorite={props.postFavorite}/>
                     <RenderComments comments={props.comments}
                         postComment={props.postComment}
-                        dishId={props.dish.id}
+                        dishId={props.dish._id}
                     />
                 </div>
             </div>

@@ -29,6 +29,7 @@ class Header extends Component {
         this.toggleNav = this.toggleNav.bind(this);
         this.toggleModal = this.toggleModal.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
+        this.handleLogout = this.handleLogout.bind(this);
     }
 
     toggleNav() {
@@ -45,8 +46,16 @@ class Header extends Component {
 
     handleLogin(event) {
         this.toggleModal();
-        alert("Username: " + this.username.value + " Password: " + this.password.value + " Remember: " + this.remember.checked);
+        // alert("Username: " + this.username.value + " Password: " + this.password.value + " Remember: " + this.remember.checked);
+        this.props.loginUser({
+            username: this.username.value,
+            password: this.password.value
+        })
         event.preventDefault();
+    }
+
+    handleLogout() {
+        this.props.logoutUser()
     }
 
     render() {
@@ -75,7 +84,22 @@ class Header extends Component {
                             </Nav>
                             <Nav className="ml-auto" navbar>
                                 <NavItem>
-                                    <Button outline onClick={this.toggleModal}><span className="fa fa-sign-in fa-lg"/> Login</Button>
+                                    {
+                                        !this.props.authentication.isAuthenticated
+                                            ?
+                                            <Button outline onClick={this.toggleModal}>
+                                                <span className="fa fa-sign-in fa-lg"/> Login
+                                                {this.props.authentication.isLoading && <span className="fa fa-spinner fa-pulse fa-fw"/>}
+                                            </Button>
+                                            :
+                                            <div>
+                                                <div className="navbar-text mr-3">{this.props.authentication.user.username}</div>
+                                                <Button outline onClick={this.handleLogout}>
+                                                    <span className="fa fa-sign-out fa-lg"/> Logout
+                                                    {this.props.authentication.isLoading && <span className="fa fa-spinner fa-pulse fa-fw"/>}
+                                                </Button>
+                                            </div>
+                                    }
                                 </NavItem>
                             </Nav>
                         </Collapse>
@@ -100,11 +124,13 @@ class Header extends Component {
                         <Form onSubmit={this.handleLogin}>
                             <FormGroup>
                                 <Label htmlFor="username">Username</Label>
-                                <Input type="text" id="username" name="username" innerRef={(input) => this.username = input}/>
+                                <Input type="text" id="username" name="username"
+                                       innerRef={(input) => this.username = input}/>
                             </FormGroup>
                             <FormGroup>
                                 <Label htmlFor="password">Password</Label>
-                                <Input type="password" id="password" name="password" innerRef={(input) => this.password = input}/>
+                                <Input type="password" id="password" name="password"
+                                       innerRef={(input) => this.password = input}/>
                             </FormGroup>
                             <FormGroup check>
                                 <Label check>

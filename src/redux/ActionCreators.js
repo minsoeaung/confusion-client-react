@@ -1,52 +1,7 @@
-import * as ActionTypes from './ActionTypes';
-import {baseUrl} from '../shared/baseUrl';
+import * as ActionTypes from './ActionTypes'; // all action types
+import {baseUrl} from '../shared/baseUrl'; // server url
 
-
-//--------------------------------------------------------------------------------------------------------
-
-export const addComment = (comment) => ({
-    type: ActionTypes.ADD_COMMENT,
-    payload: comment
-});
-
-//post comment to server
-export const postComment = (dishId, rating, author, comment) => (dispatch) => {
-    const newComment = {
-        dishId: dishId,
-        rating: rating,
-        author: author,
-        comment: comment
-    }
-    newComment.date = new Date().toISOString();
-
-    return fetch(baseUrl + 'comments', {
-        method: 'POST',
-        body: JSON.stringify(newComment),
-        headers: {
-            "Content-Type": "application/json"
-        },
-        credentials: "same-origin"
-    })
-        .then(response => {
-            if (response.ok) {
-                return response;
-            } else {
-                const error = new Error('Error' + response.status + ': ' + response.statusText);
-                error.response = response;
-                throw error;
-            }
-        }, error => {
-            throw new Error(error.message);
-        })
-        .then(response => response.json())
-        .then(response => dispatch(addComment(response)))
-        .catch(error => {
-            console.log('post comments', error.message);
-            alert('Your comment could not be posted\nError: ' + error.message);
-        });
-}
-
-//--------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------- dishes ----------------------------------------------------------
 
 export const fetchDishes = () => (dispatch) => {
 
@@ -83,7 +38,7 @@ export const addDishes = (dishes) => ({
     payload: dishes
 });
 
-//------------------------------------------------------------------------------------------------------------
+//------------------------------------------------- comments -----------------------------------------------------------
 
 export const fetchComments = () => (dispatch) => {
     return fetch(baseUrl + 'comments')
@@ -103,9 +58,50 @@ export const fetchComments = () => (dispatch) => {
         .catch(error => dispatch(commentsFailed(error.message)));
 };
 
+export const postComment = (dishId, rating, author, comment) => (dispatch) => {
+    const newComment = {
+        dishId: dishId,
+        rating: rating,
+        author: author,
+        comment: comment
+    }
+    newComment.date = new Date().toISOString();
+
+    return fetch(baseUrl + 'comments', {
+        method: 'POST',
+        body: JSON.stringify(newComment),
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: "same-origin"
+    })
+        .then(response => {
+            if (response.ok) {
+                return response;
+            } else {
+                const error = new Error('Error' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        }, error => {
+            throw new Error(error.message);
+        })
+        .then(response => response.json())
+        .then(response => dispatch(addComment(response)))
+        .catch(error => {
+            console.log('post comments', error.message);
+            alert('Your comment could not be posted\nError: ' + error.message);
+        });
+}
+
 export const commentsFailed = (errmess) => ({
     type: ActionTypes.COMMENTS_FAILED,
     payload: errmess
+});
+
+export const addComment = (comment) => ({
+    type: ActionTypes.ADD_COMMENT,
+    payload: comment
 });
 
 export const addComments = (comments) => ({
@@ -113,7 +109,7 @@ export const addComments = (comments) => ({
     payload: comments
 });
 
-//---------------------------------------------------------------------------------------------------------
+//----------------------------------------------- promotions -----------------------------------------------------------
 
 export const fetchPromos = () => (dispatch) => {
 
@@ -150,7 +146,7 @@ export const addPromos = (promos) => ({
     payload: promos
 });
 
-// -------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------- leaders ----------------------------------------------------------
 
 export const fetchLeaders = () => (dispatch) => {
 
@@ -187,7 +183,7 @@ export const addLeaders = (leaders) => ({
     payload: leaders
 });
 
-// ----------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------- feedback -------------------------------------------------------
 
 export const addFeedback = (feedback) => ({
     type: ActionTypes.ADD_FEEDBACK,
@@ -221,4 +217,85 @@ export const postFeedback = (feedback) => (dispatch) => {
             console.log('post feedback', error.message);
             alert('Your feedback could not be posted\nError: ' + error.message);
         });
+}
+
+// ------------------------------------------------- authentication ----------------------------------------------------
+
+export const requestLogin = (credentials) => {
+    return {
+        type: ActionTypes.LOGIN_REQUEST,
+        creds: credentials
+    }
+}
+
+export const receiveLogin = (response) => {
+    return {
+        type: ActionTypes.LOGIN_SUCCESS,
+        token: response.token
+    }
+}
+
+export const loginError = (message) => {
+    return {
+        type: ActionTypes.LOGIN_FAILURE,
+        message
+    }
+}
+
+export const requestLogout = () => {
+    return {
+        type: ActionTypes.LOGOUT_REQUEST
+    }
+}
+
+export const receiveLogout = () => {
+    return {
+        type: ActionTypes.LOGOUT_SUCCESS
+    }
+}
+
+export const logoutUser = () => (dispatch) => {
+    dispatch(requestLogout())
+    localStorage.removeItem('token');
+    localStorage.removeItem('creds');
+    // dispatch(favoritesFailed("Error 401: Unauthorized"));
+    dispatch(receiveLogout())
+}
+
+export const loginUser = (creds) => (dispatch) => {
+    dispatch(requestLogin(creds));
+
+    return fetch(baseUrl + 'users/login', {
+        method: 'POST',
+        body: JSON.stringify(creds),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            if (response.ok) {
+                return response;
+            } else {
+                const error = new Error('Error' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        }, error => {
+            throw new Error(error.message)
+        })
+        .then(response => response.json())
+        .then(response => {
+            if (response.success) {
+                // if login was successful, save the token in local storage
+                localStorage.setItem('token', response.token)
+                localStorage.setItem('creds', JSON.stringify(creds))
+                // dispatch(fetchFavorites())
+                dispatch(receiveLogin(response))
+            } else {
+                const error = new Error('Error' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        })
+        .catch(error => dispatch(loginError(error.message)))
 }

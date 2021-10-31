@@ -90,8 +90,9 @@ class Main extends Component {
                     comments={this.props.comments.comments.filter((comment) => comment.dish === match.params.dishId)}
                     commentsErrMess={this.props.comments.errMess}
                     postComment={this.props.postComment}
-                    favorite={this.props.favorites.favorites.dishes.some((dish) => dish._id === match.params.dishId)}
+                    favorite={this.props.favorites}
                     postFavorite={this.props.postFavorite}
+                    deleteFavorite={this.props.deleteFavorite}
                 />
                 :
                 <DishDetail
@@ -101,7 +102,7 @@ class Main extends Component {
                     comments={this.props.comments.comments.filter((comment) => comment.dish === match.params.dishId)}
                     commentsErrMess={this.props.comments.errMess}
                     postComment={this.props.postComment}
-                    favorite={false}
+                    favorite={this.props.favorites}
                     postFavorite={this.props.postFavorite}
                 />
             );

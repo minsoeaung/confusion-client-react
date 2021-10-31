@@ -22,15 +22,44 @@ import { Loading } from './LoadingComponent';
 import { baseUrl } from '../shared/baseUrl';
 import { FadeTransform, Fade, Stagger } from 'react-animation-components';
 
-function RenderDish({dish, favorite, postFavorite}) {
+function RenderDish({dish, favorite, postFavorite, deleteFavorite}) {
+    let isFavDish;
+
+    /*
+
+    *  all about isFavDish is hard coded
+    *  favorite.favorites should not be null
+    *  favorite.favorites.dishes should not be null
+    *  this is probably server side issue,
+    *  server should only send empty array, not null
+    *  that way, client will have no issue
+    *  however will fix this in server-side later once i have more knowledge of it
+    *
+    */
+
+    // the Immediately Invoked Function Expression (IIFE)
+    (() => {
+        if (favorite.favorites === null)
+            isFavDish = false
+        else if (Array.isArray(favorite.favorites.dishes))
+           isFavDish = favorite.favorites.dishes.some(favDish => favDish._id === dish._id)
+        else
+            isFavDish = false
+    })()
+
+    function handleHeartClick() {
+        if(isFavDish) deleteFavorite(dish._id)
+        else postFavorite(dish._id)
+    }
+
     return (
         <div className="col-12 col-md-5 m-1">
             <FadeTransform in transformProps={{exitTransform: 'scale(0.5) translateY(-50%)'}}>
                 <Card>
                     <CardImg width="100%" src={baseUrl + dish.image} alt={dish.name} />
                     <CardImgOverlay>
-                        <Button outline color="primary" onClick={() => favorite && postFavorite(dish._id)}>
-                            {favorite
+                        <Button outline color="primary" onClick={handleHeartClick}>
+                            {isFavDish
                                 ? <span className="fa fa-heart"/>
                                 : <span className="fa fa-heart-o"/>
                             }
@@ -106,7 +135,7 @@ function DishDetail(props) {
                     </div>
                 </div>
                 <div className="row">
-                    <RenderDish dish={props.dish} favorite={props.favorite} postFavorite={props.postFavorite}/>
+                    <RenderDish dish={props.dish} favorite={props.favorite} postFavorite={props.postFavorite} deleteFavorite={props.deleteFavorite}/>
                     <RenderComments comments={props.comments}
                         postComment={props.postComment}
                         dishId={props.dish._id}

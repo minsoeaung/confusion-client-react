@@ -7,6 +7,8 @@ import { Loading } from './LoadingComponent';
 
 /*
 *    deleting a favorites dish make the server stop lol
+*    not anymore
+*    fixed on server-side
 */
 
 
@@ -27,8 +29,8 @@ function RenderFavDish({dish, deleteFavorite}) {
     );
 }
 
-function Favorites({favorites, deleteFavorite}) {
-    if (favorites.isLoading) {
+function Favorites(props) {
+    if (props.favorites.isLoading) {
         return (
             <div className="container">
                 <div className="row">
@@ -36,20 +38,22 @@ function Favorites({favorites, deleteFavorite}) {
                 </div>
             </div>
         );
-    } else if (favorites.errMess) {
+    } else if (props.favorites.errMess) {
         return (
             <div className="container">
                 <div className="row">
-                    <h4>{favorites.errMess}</h4>
+                    <h4>{props.favorites.errMess}</h4>
                 </div>
             </div>
         );
-    } else if (favorites.favorites) {
-        const favorites = favorites.favorites.dishes.map(dish => (
-           <div key={dish._id} className="col-12 mt-5">
-                <RenderFavDish dish={dish} deleteFavorite={deleteFavorite} />
-           </div>
-        ))
+    } else if (props.favorites.favorites) {
+        const favorites = props.favorites.favorites.dishes.map(dish => {
+            return (
+                <div key={dish._id} className="col-12 mt-5">
+                    <RenderFavDish dish={dish} deleteFavorite={props.deleteFavorite}/>
+                </div>
+            );
+        })
 
         return (
             <div className="container">
@@ -74,7 +78,17 @@ function Favorites({favorites, deleteFavorite}) {
         return (
             <div className="container">
                 <div className="row">
-                    <h4>You have no favorites</h4>
+                    <Breadcrumb>
+                        <BreadcrumbItem><Link to='/home'>Home</Link></BreadcrumbItem>
+                        <BreadcrumbItem active>My Favorites</BreadcrumbItem>
+                    </Breadcrumb>
+                    <div className="col-12">
+                        <h3>My Favorites</h3>
+                        <hr />
+                    </div>
+                    <div className="row">
+                        <h4>You have no favorites</h4>
+                    </div>
                 </div>
             </div>
         );

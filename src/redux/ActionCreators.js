@@ -289,7 +289,7 @@ export const loginUser = (creds) => (dispatch) => {
                 // if login was successful, save the token in local storage
                 localStorage.setItem('token', response.token)
                 localStorage.setItem('creds', JSON.stringify(creds))
-                // dispatch(fetchFavorites())
+                dispatch(fetchFavorites())
                 dispatch(receiveLogin(response))
             } else {
                 const error = new Error('Error' + response.status + ': ' + response.statusText);
@@ -324,7 +324,7 @@ export const addFavorites = (favorites) => {
 
 export const fetchFavorites = () => (dispatch) => {
     dispatch(favoritesLoading(true))
-    const bearer = 'Bearer' + localStorage.getItem('token')
+    const bearer = 'Bearer ' + localStorage.getItem('token')
 
     return fetch(baseUrl + 'favorites', {
         headers: {
@@ -348,7 +348,7 @@ export const fetchFavorites = () => (dispatch) => {
 }
 
 export const postFavorite = (dishId) => (dispatch) => {
-    const bearer = 'Bearer' + localStorage.getItem('token')
+    const bearer = 'Bearer ' + localStorage.getItem('token')
 
     return fetch(baseUrl + 'favorites/' + dishId, {
         method: 'POST',
@@ -376,7 +376,7 @@ export const postFavorite = (dishId) => (dispatch) => {
 }
 
 export const deleteFavorite = (dishId) => (dispatch) => {
-    const bearer = 'Bearer' + localStorage.getItem('token')
+    const bearer = 'Bearer ' + localStorage.getItem('token')
 
     return fetch(baseUrl + 'favorites/' + dishId, {
         method: 'DELETE',

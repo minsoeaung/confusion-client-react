@@ -221,7 +221,7 @@ export const postFeedback = (feedback) => (dispatch) => {
         });
 }
 
-// ------------------------------------------------- authentication ----------------------------------------------------
+// ------------------------------------------------- authentication ( login )-------------------------------------------
 
 export const requestLogin = (credentials) => {
     return {
@@ -300,6 +300,71 @@ export const loginUser = (creds) => (dispatch) => {
             }
         })
         .catch(error => dispatch(loginError(error.message)))
+}
+
+// ------------------------------------------ authentication ( sign up ) -----------------------------------------------
+export const requestSignUp = () => {
+    return {
+        type: ActionTypes.SIGNUP_REQUEST
+    }
+}
+
+export const receiveSignUp = (response) => {
+    return {
+        type: ActionTypes.SIGNUP_SUCCESS,
+        success: response.success
+    }
+}
+
+export const signUpError = (message) => {
+    return {
+        type: ActionTypes.SIGNUP_FAILURE,
+        message
+    }
+}
+
+export const postSignUp = ({firstname, lastname, username, password}) => dispatch => {
+    dispatch(requestSignUp());
+
+    const signUpFormData = {
+        firstname: firstname,
+        lastname: lastname,
+        username: username,
+        password: password
+    }
+
+    return fetch(baseUrl + 'users/signup', {
+        method: 'POST',
+        body: JSON.stringify(signUpFormData),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            if (response.ok) {
+                return response;
+            } else {
+                const error = new Error('Error' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        }, error => {
+            throw new Error(error.message)
+        })
+        .then(response => response.json())
+        .then(response => {
+            if (response.success) {
+                // if sign up was successful,
+                // server will send this json
+                // {"success": true, "status": "Registration Successful!" }
+                dispatch(receiveSignUp(response))
+            } else {
+                const error = new Error('Error' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        })
+        .catch(error => dispatch(signUpError(error.message)))
 }
 
 // ------------------------------------------- favorite ----------------------------------------------------------------

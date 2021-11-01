@@ -17,6 +17,7 @@ import {
     postFeedback,
     loginUser,
     logoutUser,
+    postSignUp,
     fetchFavorites,
     postFavorite,
     deleteFavorite
@@ -32,6 +33,7 @@ const mapStateToProps = state => {
         promotions: state.promotions,
         leaders: state.leaders,
         authentication: state.authentication,
+        signUpUser: state.signUpUser,
         favorites: state.favorites
     }
 }
@@ -46,6 +48,7 @@ const mapDispatchToProps = dispatch => ({
     fetchLeaders: () => dispatch(fetchLeaders()),
     loginUser: (creds) => dispatch(loginUser(creds)),
     logoutUser: () => dispatch(logoutUser()),
+    postSignUp: (firstname, lastname, username, password) => dispatch(postSignUp(firstname, lastname, username, password)),
     fetchFavorites: () => dispatch(fetchFavorites()),
     postFavorite: (dishId) => dispatch(postFavorite(dishId)),
     deleteFavorite: (dishId) => dispatch(deleteFavorite(dishId))
@@ -125,6 +128,9 @@ class Main extends Component {
                     authentication={this.props.authentication}
                     loginUser={this.props.loginUser}
                     logoutUser={this.props.logoutUser}
+
+                    postSignUp={this.props.postSignUp}
+                    signUpUser={this.props.signUpUser}
                 />
                 <TransitionGroup>
                     <CSSTransition key={this.props.location.key} classNames="page" timeout={300}>

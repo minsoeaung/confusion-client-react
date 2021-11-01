@@ -58,20 +58,23 @@ export const fetchComments = () => (dispatch) => {
         .catch(error => dispatch(commentsFailed(error.message)));
 };
 
-export const postComment = (dishId, rating, author, comment) => (dispatch) => {
+export const postComment = (dishId, rating, comment) => (dispatch) => {
     const newComment = {
-        dishId: dishId,
+        dish: dishId,
         rating: rating,
-        author: author,
+        // author: author, ( removed since server already know who is posting this comment )
         comment: comment
     }
-    newComment.date = new Date().toISOString();
+
+    // newComment.date = new Date().toISOString(); ( removed since mongodb has timestamp)
+    const bearer = 'Bearer ' + localStorage.getItem('token')
 
     return fetch(baseUrl + 'comments', {
         method: 'POST',
         body: JSON.stringify(newComment),
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            'Authorization': bearer
         },
         credentials: "same-origin"
     })
@@ -89,8 +92,7 @@ export const postComment = (dishId, rating, author, comment) => (dispatch) => {
         .then(response => response.json())
         .then(response => dispatch(addComment(response)))
         .catch(error => {
-            console.log('post comments', error.message);
-            alert('Your comment could not be posted\nError: ' + error.message);
+            alert('Your comment could not be posted\nError: ' + error.message + '\n' + 'Login to comment on Dishes');
         });
 }
 

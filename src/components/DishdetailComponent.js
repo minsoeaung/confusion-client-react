@@ -83,11 +83,13 @@ function RenderComments({comments, postComment, dishId}) {
                 <ul className="list-unstyled">
                 <Stagger in>
                     {comments.map((comment) => {
+                        const name = comment.author === null ? "deleted user" : comment.author.username;
                         return (
                             <Fade key={comment._id}>
                                 <li>
                                     <p>{comment.comment}</p>
-                                    <p>-- {comment.author.username} , {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comment.updatedAt)))}</p>
+                                    <p>{comment.rating} stars</p>
+                                    <p>-- {name} , {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comment.updatedAt)))}</p>
                                 </li>
                             </Fade>
                         );
@@ -148,18 +150,17 @@ function DishDetail(props) {
     }
 }
 
-const required = (val) => val && val.length;
-const maxLength = (len) => (val) => !(val) || (val.length <= len);
-const minLength = (len) => (val) => val && (val.length >= len);
-
 class CommentForm extends Component {
     constructor(props){
         super(props);
         this.state = {
-            isModalOpen: false
+            isModalOpen: false,
+            rating: 1,
+            comment: "",
         }
 
         this.toggleModal = this.toggleModal.bind(this);
+        this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
@@ -169,9 +170,15 @@ class CommentForm extends Component {
         });
     }
 
+    handleChange(event) {
+        this.setState({
+            rating: event.target.value
+        })
+    }
+
     handleSubmit(values) {
         this.toggleModal();
-        this.props.postComment(this.props.dishId, values.rating, values.author, values.comment);
+        this.props.postComment(this.props.dishId, this.state.rating, values.comment);
     }
 
     render() {
@@ -186,36 +193,15 @@ class CommentForm extends Component {
                             <Row className="form-group">
                                 <Label htmlFor="rating" md={12}>Rating</Label>
                                 <Col md={12}>
-                                    <Control.select model=".rating" name="rating" className="form-control">
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                        <option>5</option>
+                                    <Control.select model=".rating" id="rating" name="rating" className="form-control"
+                                        value={this.state.rating} onChange={this.handleChange}
+                                    >
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
                                     </Control.select>
-                                </Col>
-                            </Row>
-                            <Row className="form-group">
-                                <Label htmlFor="author" md={12}>Your Name</Label>
-                                <Col md={12}>
-                                    <Control.text
-                                        model=".author" id="author" name="author"
-                                        placeholder="Your Name"
-                                        className="form-control"
-                                        validators={{
-                                            required, minLength: minLength(3), maxLength: maxLength(15)
-                                        }}
-                                    />
-                                    <Errors
-                                        className="text-danger"
-                                        model=".author"
-                                        show="touched"
-                                        messages={{
-                                            required: 'Required',
-                                            minLength: 'Must be greater than 2 characters',
-                                            maxLength: 'Must be 15 characters or less'
-                                        }}
-                                    />
                                 </Col>
                             </Row>
                             <Row className="form-group">

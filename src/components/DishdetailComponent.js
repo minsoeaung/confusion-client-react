@@ -17,10 +17,11 @@ import {
     CardImgOverlay
 } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import { Control, LocalForm, Errors } from 'react-redux-form';
+import { Control, LocalForm } from 'react-redux-form';
 import { Loading } from './LoadingComponent';
 import { baseUrl } from '../shared/baseUrl';
 import { FadeTransform, Fade, Stagger } from 'react-animation-components';
+import StarRating from "./StarRatingComponent";
 
 function RenderDish({dish, favorite, postFavorite, deleteFavorite}) {
     let isFavDish;
@@ -80,18 +81,21 @@ function RenderComments({comments, postComment, dishId}) {
         return (
             <div className="col-12 col-md-5 m-1">
                 <h4>Comments</h4>
-                <ul className="list-unstyled">
+                <ul className="list-unstyled pb-2">
                 <Stagger in>
                     {comments.map((comment) => {
                         const name = comment.author === null ? "deleted user" : comment.author.username;
                         return (
-                            <Fade key={comment._id}>
-                                <li>
-                                    <p>{comment.comment}</p>
-                                    <p>{comment.rating} stars</p>
-                                    <p>-- {name} , {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comment.updatedAt)))}</p>
-                                </li>
-                            </Fade>
+                        <Fade key={comment._id}>
+                            <li className="mt-4 bg-light pt-3 pl-3 pr-3 pb-2 rounded">
+                                <span className="fa fa-user-circle fa-lg mr-1"/> {name}
+                                <div className="row pl-3 align-items-center text-muted">
+                                    <StarRating value={comment.rating} /> &nbsp;
+                                    <span className="small">{new Intl.DateTimeFormat('en-UK', { year: 'numeric', month: 'numeric', day: '2-digit'}).format(new Date(Date.parse(comment.updatedAt)))}</span>
+                                </div>
+                                <span className="text-secondary">{comment.comment}</span>
+                            </li>
+                        </Fade>
                         );
                     })}
                 </Stagger>
@@ -184,7 +188,7 @@ class CommentForm extends Component {
     render() {
         return (
             <>
-                <Button outline onClick={this.toggleModal}><span className="fa fa-pencil fa-lg"/> Submit Comment</Button>
+                <Button className="mt-4" outline onClick={this.toggleModal}><span className="fa fa-pencil fa-lg"/> Submit Comment</Button>
 
                 <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
                     <ModalHeader toggle={this.toggleModal}>Submit Comment</ModalHeader>

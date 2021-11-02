@@ -217,7 +217,7 @@ export const postFeedback = (feedback) => (dispatch) => {
         .then(response => dispatch(addFeedback(response)))
         .catch(error => {
             console.log('post feedback', error.message);
-            alert('Your feedback could not be posted\nError: ' + error.message);
+            alert('Server side does not support accepting feedback yet');
         });
 }
 
